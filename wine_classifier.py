@@ -22,16 +22,35 @@ CLASS_COLOURS = [CLASS_1_C,CLASS_2_C,CLASS_3_C]
 
 MODES = ['feature_sel', 'knn', 'alt', 'knn_3d', 'knn_pca']    
 
+def calculate_accuracy(gt_labels, pred_labels):
+    return np.sum(gt_labels==pred_labels)/len(gt_labels)
+
 def feature_selection(train_set, train_labels, **kwargs):
     # write your code here and make sure you return the features at the end of 
     # the function
-    return []
 
+            
+    return [0,6]
+
+#Helper function to get features out
+def feature_extract(train_set, test_set, feature1,feature2):
+    reduced_train = train_set[:,[feature1,feature2]]
+    reduced_test  = test_set [:,[feature1,feature2]]
+    return reduced_train,reduced_test
 
 def knn(train_set, train_labels, test_set, k, **kwargs):
     # write your code here and make sure you return the predictions at the end of 
     # the function
-    return []
+
+    #I think this is correct. I need to refactor it anyway.
+    features = feature_selection(train_set,train_labels)
+    r_tr, r_te = feature_extract(train_set,test_set,features[0],features[1])
+    dist = lambda x, y: np.sqrt(np.sum((x-y)**2))
+    k_nearest_points = lambda x: sorted([(dist(x,point[0]),point[1]) for point in zip(r_tr,train_labels)], key = lambda x: x[0])
+    k_nearest_neighbours = lambda x,k: [m[1] for m in k_nearest_points(x)[:k]]
+    classification = lambda x,k: int(max(set(k_nearest_neighbours(x,k)),key=k_nearest_neighbours(x,k).count))
+    return [classification(p,k) for p in r_te]
+
 
 
 def alternative_classifier(train_set, train_labels, test_set, **kwargs):
@@ -49,7 +68,22 @@ def knn_three_features(train_set, train_labels, test_set, k, **kwargs):
 def knn_pca(train_set, train_labels, test_set, k, n_components=2, **kwargs):
     # write your code here and make sure you return the predictions at the end of 
     # the function
-    return []
+
+    #PCA FOR n_components = 2
+    covariance = np.cov(train_set,rowvar=False)
+    eigenval,eigenvec = np.linalg.eig(covariance)
+    eigenvec = eigenvec.transpose()
+
+    #Sort eigenvectors on decreasing eigenvalues
+    s_eigenvec = [x for y,x in sorted(zip(eigenval,eigenvec),reverse=True)]
+    #Create a transformation matrix (potential refactor)
+    w = np.transpose(np.vstack((s_eigenvec[0],s_eigenvec[1])))
+
+    #Transform the dataset
+    w_train = np.dot(train_set , w)
+    w_test = np.dot(test_set, w)
+    return knn(w_train,train_labels,w_test,k)
+
 
 
 def parse_args():
@@ -81,6 +115,8 @@ if __name__ == '__main__':
     elif mode == 'knn':
         predictions = knn(train_set, train_labels, test_set, args.k)
         print_predictions(predictions)
+        print(test_labels)
+        print(calculate_accuracy(test_labels,predictions))
     elif mode == 'alt':
         predictions = alternative_classifier(train_set, train_labels, test_set)
         print_predictions(predictions)
