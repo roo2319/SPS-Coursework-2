@@ -60,6 +60,28 @@ def knn(train_set, train_labels, test_set, k, **kwargs):
 def alternative_classifier(train_set, train_labels, test_set, **kwargs):
     # write your code here and make sure you return the predictions at the end of 
     # the function
+    ## Let's go for a naive bayes classifier
+    
+    #First we need to decide on the distribution. We will model as normal
+    r_tr, r_te = feature_extract(train_set,test_set,feature_selection(train_set,train_labels))
+    meanvar = np.mean(r_tr[train_labels==1],axis=0)
+    meanvar = np.vstack((meanvar, np.var(r_tr[train_labels==1],axis=0)))
+    for i in range(2):
+        meanvar = np.vstack((meanvar,np.mean(r_tr[train_labels==i+2],axis=0)))
+        meanvar = np.vstack((meanvar,np.var(r_tr[train_labels==i+2],axis=0)))
+
+    print(meanvar)
+
+    ##MATRIX OF FORM
+    #MEAN feat1 class1, MEAN feat2 class1
+    #VAR  feat1 class1, VAR  feat2 class1
+
+    while(True):
+        pass
+
+    #Next we use this as the basis of our naive bayes classifier.
+
+    #Laplace correction
 
 
 
