@@ -125,8 +125,8 @@ def feature_extract(train_set, test_set, features):
     reduced_test  = test_set [:,features]
     return reduced_train,reduced_test
 
-def knn_alg(train_set, train_labels, test_set, k):
-    dist = lambda x, y: np.sqrt(np.sum((x-y)**2))
+def knn_alg(train_set, train_labels, test_set, k, n):
+    dist = lambda x, y: (np.sum((x-y)**n))**(1/n)
     k_nearest_points = lambda x: sorted([(dist(x,point[0]),point[1]) for point in zip(train_set,train_labels)], key = lambda x: x[0])
     k_nearest_neighbours = lambda x,k: [m[1] for m in k_nearest_points(x)[:k]]
     classification = lambda x,k: int(max(set(k_nearest_neighbours(x,k)),key=k_nearest_neighbours(x,k).count))
@@ -139,7 +139,7 @@ def knn(train_set, train_labels, test_set, k, **kwargs):
     #I think this is correct. I need to refactor it anyway.
     features = feature_selection(train_set,train_labels)
     r_tr, r_te = feature_extract(train_set,test_set,features)
-    return knn_alg(r_tr,train_labels,r_te,k)
+    return knn_alg(r_tr,train_labels,r_te,k,2)
 
 
 
@@ -163,7 +163,8 @@ def alternative_classifier(train_set, train_labels, test_set, **kwargs):
 def knn_three_features(train_set, train_labels, test_set, k, **kwargs):
     # write your code here and make sure you return the predictions at the end of 
     # the function
-    return []
+    r_tr, r_te = feature_extract(train_set,test_set,[0,6,9])
+    return knn_alg(r_tr,train_labels,r_te,k,3)
 
 
 def knn_pca(train_set, train_labels, test_set, k, n_components=2, **kwargs):
