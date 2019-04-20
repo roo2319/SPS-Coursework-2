@@ -12,6 +12,7 @@ from __future__ import print_function
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
+import scipy.stats as stats
 from utilities import load_data, print_features, print_predictions
 
 # you may use these colours to produce the scatter plots
@@ -21,6 +22,94 @@ CLASS_3_C = r'#ffc34d'
 CLASS_COLOURS = [CLASS_1_C,CLASS_2_C,CLASS_3_C]
 
 MODES = ['feature_sel', 'knn', 'alt', 'knn_3d', 'knn_pca']    
+
+##Takes in class counts
+def impurity(classes,total):
+    entropy = 0
+    for i in range(len(classes)):
+        if sum(classes[i]) != 0:
+            probability =  list(map(lambda x: x/sum(classes[i]),classes[i]))
+        else:
+            probability = []
+        entropy += (sum(classes[i])/total) * stats.entropy(probability)
+    return entropy
+     
+
+
+class decision_tree:
+    def __init__(self,left=None,right=None,feature=None, split=None,leaf=False):
+        #Left tree
+        self.left = left
+        #Right tree
+        self.right = right
+        #The actual literal value in the condition, scope issues
+        self.split = split
+        #feature to split on
+        self.feature = feature
+        #Is leaf
+        self.leaf = leaf
+
+    def build(self,observations,labels):
+        if len(set(labels)) == 1:
+            #If all labels are the same, we will make the node terminal
+            self.split = labels[0]
+            self.leaf = True
+            return self
+        else:
+            #We need to find the best feature to split on
+            entropyScore = np.zeros(observations.shape)
+            for feature in range(observations.shape[1]):
+                for sample in range(observations.shape[0]):
+                    classCount = [[0,0,0],[0,0,0]]
+                    for k in range(observations.shape[0]):
+                        if observations[k,feature] <= observations[sample,feature]:
+                            classCount[0][int(labels[k])-1] += 1
+                        else:
+                            classCount[1][int(labels[k])-1] += 1
+                    
+
+
+                    #print("Proability: {}".format(probability))
+                    #print("impurity: {}".format(impurity(probability)))
+                    entropyScore[sample,feature] = impurity(classCount,len(observations))
+            best = np.argmin(entropyScore)
+            self.split = observations[best//2,best%2]
+            self.feature = best%2
+            lobservations = []
+            llabels = []
+            robservations = []
+            rlabels = []
+            for i in range(len(observations)):
+                if observations[i,best%2] <= observations[best//2,best%2]:
+                    lobservations.append(observations[i])
+                    llabels.append(labels[i])
+                else: 
+                    robservations.append(observations[i])
+                    rlabels.append(labels[i])
+
+            #Convert observation types
+            lobservations = np.array(lobservations)
+            robservations = np.array(robservations)
+            self.left = decision_tree().build(lobservations,llabels)
+            self.right = decision_tree().build(robservations,rlabels)
+            return self
+            
+
+        
+
+    #Classify a single observation on a prebuilt model
+    def classify(self,observation):
+        if self.split == None:
+            print("Have you built the model?")
+            return None
+        elif self.leaf:
+            return self.split
+        elif observation[self.feature] <= self.split:
+            return self.left.classify(observation)
+        else:
+            return self.right.classify(observation)
+    
+
 
 def calculate_accuracy(gt_labels, pred_labels):
     return np.sum(gt_labels==pred_labels)/len(gt_labels)
@@ -60,32 +149,17 @@ def knn(train_set, train_labels, test_set, k, **kwargs):
 def alternative_classifier(train_set, train_labels, test_set, **kwargs):
     # write your code here and make sure you return the predictions at the end of 
     # the function
-    ## Let's go for a naive bayes classifier
-    
+    ## Let's go for decision trees
     #First we need to decide on the distribution. We will model as normal
     r_tr, r_te = feature_extract(train_set,test_set,feature_selection(train_set,train_labels))
-    meanvar = np.mean(r_tr[train_labels==1],axis=0)
-    meanvar = np.vstack((meanvar, np.var(r_tr[train_labels==1],axis=0)))
-    for i in range(2):
-        meanvar = np.vstack((meanvar,np.mean(r_tr[train_labels==i+2],axis=0)))
-        meanvar = np.vstack((meanvar,np.var(r_tr[train_labels==i+2],axis=0)))
-
-    print(meanvar)
-
-    ##MATRIX OF FORM
-    #MEAN feat1 class1, MEAN feat2 class1
-    #VAR  feat1 class1, VAR  feat2 class1
-
-    while(True):
-        pass
-
-    #Next we use this as the basis of our naive bayes classifier.
-
-    #Laplace correction
+    model = decision_tree()
+    model.build(r_tr,train_labels)
+    return[model.classify(observation) for observation in r_te]
+    
+        
 
 
 
-    return []
 
 
 def knn_three_features(train_set, train_labels, test_set, k, **kwargs):
@@ -150,6 +224,7 @@ if __name__ == '__main__':
     elif mode == 'alt':
         predictions = alternative_classifier(train_set, train_labels, test_set)
         print_predictions(predictions)
+        print(calculate_accuracy(test_labels,predictions))
     elif mode == 'knn_3d':
         predictions = knn_three_features(train_set, train_labels, test_set, args.k)
         print_predictions(predictions)
