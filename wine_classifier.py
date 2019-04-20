@@ -46,7 +46,7 @@ class decision_tree:
         self.split = split
         #feature to split on
         self.feature = feature
-        #Is leaf
+        #Is leaf?
         self.leaf = leaf
 
     def build(self,observations,labels):
@@ -69,8 +69,6 @@ class decision_tree:
                     
 
 
-                    #print("Proability: {}".format(probability))
-                    #print("impurity: {}".format(impurity(probability)))
                     entropyScore[sample,feature] = impurity(classCount,len(observations))
             best = np.argmin(entropyScore)
             self.split = observations[best//2,best%2]
@@ -216,21 +214,21 @@ if __name__ == '__main__':
     if mode == 'feature_sel':
         selected_features = feature_selection(train_set, train_labels)
         print_features(selected_features)
+
     elif mode == 'knn':
         predictions = knn(train_set, train_labels, test_set, args.k)
         print_predictions(predictions)
-        print(test_labels)
-        print(calculate_accuracy(test_labels,predictions))
+
     elif mode == 'alt':
         predictions = alternative_classifier(train_set, train_labels, test_set)
         print_predictions(predictions)
-        print(calculate_accuracy(test_labels,predictions))
+
     elif mode == 'knn_3d':
         predictions = knn_three_features(train_set, train_labels, test_set, args.k)
         print_predictions(predictions)
+
     elif mode == 'knn_pca':
         predictions = knn_pca(train_set, train_labels, test_set, args.k)
         print_predictions(predictions)
-        print(calculate_accuracy(test_labels,predictions))
     else:
         raise Exception('Unrecognised mode: {}. Possible modes are: {}'.format(mode, MODES))
