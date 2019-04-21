@@ -57,20 +57,19 @@ class decision_tree:
             return self
         else:
             #We need to find the best feature to split on
-            entropyScore = np.zeros(observations.shape)
+            score = np.zeros(observations.shape)
             for feature in range(observations.shape[1]):
                 for sample in range(observations.shape[0]):
                     classCount = [[0,0,0],[0,0,0]]
-                    for k in range(observations.shape[0]):
-                        if observations[k,feature] <= observations[sample,feature]:
-                            classCount[0][int(labels[k])-1] += 1
+                    #Compare each observation to the sample 
+                    for i in range(observations.shape[0]):
+                        if observations[i,feature] <= observations[sample,feature]:
+                            classCount[0][int(labels[i])-1] += 1
                         else:
-                            classCount[1][int(labels[k])-1] += 1
-                    
+                            classCount[1][int(labels[i])-1] += 1
 
-
-                    entropyScore[sample,feature] = impurity(classCount,len(observations))
-            best = np.argmin(entropyScore)
+                    score[sample,feature] = impurity(classCount,len(observations))
+            best = np.argmin(score)
             self.split = observations[best//2,best%2]
             self.feature = best%2
             lobservations = []
@@ -127,16 +126,21 @@ def feature_extract(train_set, test_set, features):
 
 def knn_alg(train_set, train_labels, test_set, k, n):
     dist = lambda x, y: (np.sum((x-y)**n))**(1/n)
+
+    #Return a list of tuples (dist,class) sorted on dist
     k_nearest_points = lambda x: sorted([(dist(x,point[0]),point[1]) for point in zip(train_set,train_labels)], key = lambda x: x[0])
+
+    #Access the class given by the slice of size k of the sorted list
     k_nearest_neighbours = lambda x,k: [m[1] for m in k_nearest_points(x)[:k]]
-    classification = lambda x,k: int(max(set(k_nearest_neighbours(x,k)),key=k_nearest_neighbours(x,k).count))
+
+    #The classification will be the mode
+    classification = lambda x,k: stats.mode(k_nearest_neighbours(x,k))[0][0]
     return [classification(p,k) for p in test_set]
 
 def knn(train_set, train_labels, test_set, k, **kwargs):
     # write your code here and make sure you return the predictions at the end of 
     # the function
 
-    #I think this is correct. I need to refactor it anyway.
     features = feature_selection(train_set,train_labels)
     r_tr, r_te = feature_extract(train_set,test_set,features)
     return knn_alg(r_tr,train_labels,r_te,k,2)
@@ -185,7 +189,7 @@ def knn_pca(train_set, train_labels, test_set, k, n_components=2, **kwargs):
     #Transform the dataset
     w_train = np.dot(train_set , w)
     w_test = np.dot(test_set, w)
-    return knn_alg(w_train,train_labels,w_test,k)
+    return knn_alg(w_train,train_labels,w_test,k,2)
 
 
 
@@ -219,7 +223,7 @@ if __name__ == '__main__':
     elif mode == 'knn':
         predictions = knn(train_set, train_labels, test_set, args.k)
         print_predictions(predictions)
-
+        print(calculate_accuracy(test_labels,predictions))
     elif mode == 'alt':
         predictions = alternative_classifier(train_set, train_labels, test_set)
         print_predictions(predictions)
