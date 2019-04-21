@@ -223,7 +223,7 @@ if __name__ == '__main__':
     elif mode == 'knn':
         predictions = knn(train_set, train_labels, test_set, args.k)
         print_predictions(predictions)
-        print(calculate_accuracy(test_labels,predictions))
+
     elif mode == 'alt':
         predictions = alternative_classifier(train_set, train_labels, test_set)
         print_predictions(predictions)
