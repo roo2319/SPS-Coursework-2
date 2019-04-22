@@ -14,6 +14,7 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats as stats
+from sklearn.decomposition import PCA
 from utilities import load_data, print_features, print_predictions
 
 # you may use these colours to produce the scatter plots
@@ -132,7 +133,7 @@ def feature_selection(train_set, train_labels, **kwargs):
     # the function
 
             
-    return [0,6]
+    return [6,9]
 
 #Helper function to get features out
 def feature_extract(train_set, test_set, features):
@@ -197,20 +198,10 @@ def knn_pca(train_set, train_labels, test_set, k, n_components=2, **kwargs):
     # write your code here and make sure you return the predictions at the end of 
     # the function
 
-    #PCA FOR n_components = 2
-    covariance = np.cov(train_set,rowvar=False)
-    eigenval,eigenvec = np.linalg.eig(covariance)
-    eigenvec = eigenvec.transpose()
-
-    #Sort eigenvectors on decreasing eigenvalues
-    s_eigenvec = [x for y,x in sorted(zip(eigenval,eigenvec),reverse=True)]
-    #Create a transformation matrix (potential refactor)
-    # THIS NEEDS TO BE MORE GENERAL
-    w = np.transpose(np.vstack((s_eigenvec[0],s_eigenvec[1])))
-
-    #Transform the dataset
-    w_train = np.dot(train_set , w)
-    w_test = np.dot(test_set, w)
+    pca = PCA(2)
+    pca.fit(train_set)
+    w_train = pca.transform(train_set)
+    w_test  = pca.transform(test_set)
     return knn_alg(w_train,train_labels,w_test,k,2)
 
 
