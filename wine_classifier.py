@@ -10,6 +10,7 @@ to print your results
 from __future__ import print_function
 
 import argparse
+import random
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats as stats
@@ -24,6 +25,21 @@ CLASS_COLOURS = [CLASS_1_C,CLASS_2_C,CLASS_3_C]
 MODES = ['feature_sel', 'knn', 'alt', 'knn_3d', 'knn_pca']    
 
 ##Takes in class counts
+
+def random_forest(train_set,train_labels,t,s):
+    trees = []
+    for i in range(t):
+        train_bag = np.zeros((s,train_set.shape[1]))
+        train_bag_labels = []
+        for j in range(s):
+            index = random.randrange(0,len(train_set))
+            train_bag[j] = train_set[index]
+            train_bag_labels.append(train_labels[index])
+        
+        trees.append(decision_tree().build(train_bag,train_bag_labels))
+    return trees
+
+
 def impurity(classes,total):
     entropy = 0
     for i in range(len(classes)):
@@ -154,10 +170,16 @@ def alternative_classifier(train_set, train_labels, test_set, **kwargs):
     ## Let's go for decision trees
     #First we need to decide on the distribution. We will model as normal
     r_tr, r_te = feature_extract(train_set,test_set,feature_selection(train_set,train_labels))
+    model = random_forest(r_tr,train_labels,100,100)
+    c = lambda p: stats.mode(list(map(lambda x: x.classify(p),model)))[0][0]
+    return [c(p) for p in r_te]
+
+
+    '''
     model = decision_tree()
     model.build(r_tr,train_labels)
     return[model.classify(observation) for observation in r_te]
-    
+    '''
         
 
 
@@ -227,6 +249,7 @@ if __name__ == '__main__':
     elif mode == 'alt':
         predictions = alternative_classifier(train_set, train_labels, test_set)
         print_predictions(predictions)
+        print(calculate_accuracy(test_labels,predictions))
 
     elif mode == 'knn_3d':
         predictions = knn_three_features(train_set, train_labels, test_set, args.k)
