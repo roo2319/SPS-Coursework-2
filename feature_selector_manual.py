@@ -10,20 +10,21 @@ CLASS_2_C = r'#cc3300'
 CLASS_3_C = r'#ffc34d'
 CLASS_COLOURS = [CLASS_1_C,CLASS_2_C,CLASS_3_C]
 
-plt.rc('figure', figsize=(12, 8), dpi=110)
-plt.rc('font', size=12)
+plt.rc('figure', figsize=(12, 4), dpi=110)
+plt.rc('font', size=10)
 
 train_set, train_labels, test_set, test_labels = load_data()
 
-n_features = train_set.shape[1]
-fig, ax = plt.subplots(n_features, n_features)
-plt.subplots_adjust(left=0.01, right=0.99, top=0.99, bottom=0.01, wspace=0.2, hspace=0.4)
+#n_features = train_set.shape[1]
+fig, ax = plt.subplots(4,4)
+#plt.subplots_adjust(left=0.01, right=0.99, top=0.99, bottom=0.01, wspace=0.4, hspace=1.2)
 int_labels = list(map(lambda x: int(x),train_labels))
 colour_list = list(map(lambda x : CLASS_COLOURS[x-1], int_labels))
+for i in range(train_set.shape[1]):
+        ax[i//4][i%4].scatter(train_set[:,6],train_set[:,i], color=colour_list,s=10)
+        ax[i//4][i%4].set_title("{} vs {}".format(6,i))
+       
 
-for i in range(n_features):
-    for j in range(n_features):
-        ax[i][j].scatter(train_set[:,i],train_set[:,j], color=colour_list,s=1)
-        ax[i][j].set_title("{} vs {}".format(i,j))
 
+plt.tight_layout()
 plt.show()

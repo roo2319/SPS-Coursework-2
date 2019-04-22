@@ -133,7 +133,7 @@ def feature_selection(train_set, train_labels, **kwargs):
     # the function
 
             
-    return [6,9]
+    return [0,6]
 
 #Helper function to get features out
 def feature_extract(train_set, test_set, features):

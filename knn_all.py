@@ -49,7 +49,7 @@ def plot_matrix(matrix, ax=None):
     plt.colorbar(handle)
     plt.show()
 
-
+plt.subplots_adjust(0.125,0.1,0.9,0.9,0.2)
 accuracy_mat = np.zeros((13,13))
 for i in range(13):
     for j in range(13):
