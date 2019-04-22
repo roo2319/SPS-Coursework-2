@@ -26,12 +26,12 @@ MODES = ['feature_sel', 'knn', 'alt', 'knn_3d', 'knn_pca']
 
 ##Takes in class counts
 
-def random_forest(train_set,train_labels,t,s):
+def random_forest(train_set,train_labels,t):
     trees = []
     for i in range(t):
-        train_bag = np.zeros((s,train_set.shape[1]))
+        train_bag = np.zeros(train_set.shape)
         train_bag_labels = []
-        for j in range(s):
+        for j in range(train_set.shape[0]):
             index = random.randrange(0,len(train_set))
             train_bag[j] = train_set[index]
             train_bag_labels.append(train_labels[index])
@@ -164,13 +164,13 @@ def knn(train_set, train_labels, test_set, k, **kwargs):
 
 
 
-def alternative_classifier(train_set, train_labels, test_set, **kwargs):
+def alternative_classifier(train_set, train_labels, test_set,trees, **kwargs):
     # write your code here and make sure you return the predictions at the end of 
     # the function
     ## Let's go for decision trees
     #First we need to decide on the distribution. We will model as normal
     r_tr, r_te = feature_extract(train_set,test_set,feature_selection(train_set,train_labels))
-    model = random_forest(r_tr,train_labels,100,100)
+    model = random_forest(r_tr,train_labels,trees)
     c = lambda p: stats.mode(list(map(lambda x: x.classify(p),model)))[0][0]
     return [c(p) for p in r_te]
 
@@ -219,6 +219,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('mode', nargs=1, type=str, help='Running mode. Must be one of the following modes: {}'.format(MODES))
     parser.add_argument('--k', nargs='?', type=int, default=1, help='Number of neighbours for knn')
+    parser.add_argument('--trees', nargs='?',type=int, default=10,help='Number of trees for random forest')
     parser.add_argument('--train_set_path', nargs='?', type=str, default='data/wine_train.csv', help='Path to the training set csv')
     parser.add_argument('--train_labels_path', nargs='?', type=str, default='data/wine_train_labels.csv', help='Path to training labels')
     parser.add_argument('--test_set_path', nargs='?', type=str, default='data/wine_test.csv', help='Path to the test set csv')
@@ -245,9 +246,10 @@ if __name__ == '__main__':
     elif mode == 'knn':
         predictions = knn(train_set, train_labels, test_set, args.k)
         print_predictions(predictions)
+        print(calculate_accuracy(test_labels,predictions))
 
     elif mode == 'alt':
-        predictions = alternative_classifier(train_set, train_labels, test_set)
+        predictions = alternative_classifier(train_set, train_labels, test_set,args.trees)
         print_predictions(predictions)
         print(calculate_accuracy(test_labels,predictions))
 
