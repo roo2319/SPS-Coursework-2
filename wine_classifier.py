@@ -15,6 +15,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats as stats
 from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
 from utilities import load_data, print_features, print_predictions
 
 # you may use these colours to produce the scatter plots
@@ -133,7 +134,7 @@ def feature_selection(train_set, train_labels, **kwargs):
     # the function
 
             
-    return [0,6]
+    return [6,9]
 
 #Helper function to get features out
 def feature_extract(train_set, test_set, features):
@@ -160,6 +161,9 @@ def knn(train_set, train_labels, test_set, k, **kwargs):
 
     features = feature_selection(train_set,train_labels)
     r_tr, r_te = feature_extract(train_set,test_set,features)
+    scaler = StandardScaler()
+    r_tr = scaler.fit_transform(r_tr)
+    r_te = scaler.fit_transform(r_te)
     return knn_alg(r_tr,train_labels,r_te,k,2)
 
 
@@ -190,7 +194,10 @@ def alternative_classifier(train_set, train_labels, test_set,trees, **kwargs):
 def knn_three_features(train_set, train_labels, test_set, k, **kwargs):
     # write your code here and make sure you return the predictions at the end of 
     # the function
-    r_tr, r_te = feature_extract(train_set,test_set,[0,6,9])
+    r_tr, r_te = feature_extract(train_set,test_set,[0,6,11])
+    scaler = StandardScaler()
+    r_tr = scaler.fit_transform(r_tr)
+    r_te = scaler.fit_transform(r_te)
     return knn_alg(r_tr,train_labels,r_te,k,3)
 
 
@@ -198,7 +205,10 @@ def knn_pca(train_set, train_labels, test_set, k, n_components=2, **kwargs):
     # write your code here and make sure you return the predictions at the end of 
     # the function
 
-    pca = PCA(2)
+    pca = PCA(n_components)
+    scaler = StandardScaler()
+    train_set = scaler.fit_transform(train_set)
+    test_set = scaler.fit_transform(test_set)
     pca.fit(train_set)
     w_train = pca.transform(train_set)
     w_test  = pca.transform(test_set)
@@ -210,7 +220,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('mode', nargs=1, type=str, help='Running mode. Must be one of the following modes: {}'.format(MODES))
     parser.add_argument('--k', nargs='?', type=int, default=1, help='Number of neighbours for knn')
-    parser.add_argument('--trees', nargs='?',type=int, default=10,help='Number of trees for random forest')
+    parser.add_argument('--trees', nargs='?',type=int, default=15,help='Number of trees for random forest')
     parser.add_argument('--train_set_path', nargs='?', type=str, default='data/wine_train.csv', help='Path to the training set csv')
     parser.add_argument('--train_labels_path', nargs='?', type=str, default='data/wine_train_labels.csv', help='Path to training labels')
     parser.add_argument('--test_set_path', nargs='?', type=str, default='data/wine_test.csv', help='Path to the test set csv')
@@ -237,19 +247,20 @@ if __name__ == '__main__':
     elif mode == 'knn':
         predictions = knn(train_set, train_labels, test_set, args.k)
         print_predictions(predictions)
-        print(calculate_accuracy(test_labels,predictions))
 
     elif mode == 'alt':
         predictions = alternative_classifier(train_set, train_labels, test_set,args.trees)
         print_predictions(predictions)
-        print(calculate_accuracy(test_labels,predictions))
+
 
     elif mode == 'knn_3d':
         predictions = knn_three_features(train_set, train_labels, test_set, args.k)
         print_predictions(predictions)
 
+
     elif mode == 'knn_pca':
         predictions = knn_pca(train_set, train_labels, test_set, args.k)
         print_predictions(predictions)
+        
     else:
         raise Exception('Unrecognised mode: {}. Possible modes are: {}'.format(mode, MODES))
