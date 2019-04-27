@@ -163,7 +163,7 @@ def knn(train_set, train_labels, test_set, k, **kwargs):
     r_tr, r_te = feature_extract(train_set,test_set,features)
     scaler = StandardScaler()
     r_tr = scaler.fit_transform(r_tr)
-    r_te = scaler.fit_transform(r_te)
+    r_te = scaler.transform(r_te)
     return knn_alg(r_tr,train_labels,r_te,k,2)
 
 
@@ -197,7 +197,7 @@ def knn_three_features(train_set, train_labels, test_set, k, **kwargs):
     r_tr, r_te = feature_extract(train_set,test_set,[0,6,11])
     scaler = StandardScaler()
     r_tr = scaler.fit_transform(r_tr)
-    r_te = scaler.fit_transform(r_te)
+    r_te = scaler.transform(r_te)
     return knn_alg(r_tr,train_labels,r_te,k,3)
 
 
@@ -208,7 +208,7 @@ def knn_pca(train_set, train_labels, test_set, k, n_components=2, **kwargs):
     pca = PCA(n_components)
     scaler = StandardScaler()
     train_set = scaler.fit_transform(train_set)
-    test_set = scaler.fit_transform(test_set)
+    test_set = scaler.transform(test_set)
     pca.fit(train_set)
     w_train = pca.transform(train_set)
     w_test  = pca.transform(test_set)
@@ -261,6 +261,6 @@ if __name__ == '__main__':
     elif mode == 'knn_pca':
         predictions = knn_pca(train_set, train_labels, test_set, args.k)
         print_predictions(predictions)
-        
+
     else:
         raise Exception('Unrecognised mode: {}. Possible modes are: {}'.format(mode, MODES))
