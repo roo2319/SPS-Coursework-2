@@ -143,10 +143,8 @@ def feature_extract(train_set, test_set, features):
     return reduced_train,reduced_test
 
 def knn_alg(train_set, train_labels, test_set, k, n):
-    if n == 2:
-        dist = lambda x, y: np.sqrt(np.sum((x-y)**2))
-    elif n == 3:
-        dist = lambda x,y: np.cbrt(np.sum((x-y)**2))
+
+    dist = lambda x, y: np.sqrt(np.sum((x-y)**2))
 
 
     #Return a list of tuples (dist,class) sorted on dist
