@@ -19,7 +19,7 @@ def load_data(train_set_path='data/wine_train.csv',
     """
     
     train_set = np.loadtxt(train_set_path, delimiter=',')
-    train_labels = np.loadtxt(train_labels_path, delimiter=',')
+    train_labels = np.loadtxt(train_labels_path, delimiter=',', dtype=np.int)
     test_set = np.loadtxt(test_set_path, delimiter=',')
     test_labels = np.loadtxt(test_labels_path, delimiter=',', dtype=np.int)
     
