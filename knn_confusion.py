@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from utilities import load_data, print_features, print_predictions
 from wine_classifier import calculate_accuracy, feature_extract, feature_selection
-from wine_classifier import knn_three_features as knn_3d
+from wine_classifier import knn_three_features as knn
 
 train_set, train_labels, test_set, test_labels = load_data()
 plt.rc('figure', figsize=(12, 12), dpi=110)
@@ -43,15 +43,16 @@ def plot_matrix(matrix, ax=None):
 
 fig, ax = plt.subplots(2,3)
 r_tr,r_te = feature_extract(train_set,test_set,feature_selection(train_set,train_labels))
+
 for i in range(0,5):
-    plot_matrix(calculate_confusion_matrix(test_labels,np.array(knn_3d(train_set,train_labels,test_set,i+1))),ax[i//3][i%3])
-    acc = (calculate_accuracy(test_labels,knn_3d(train_set,train_labels,test_set,i+1)))
+    plot_matrix(calculate_confusion_matrix(test_labels,np.array(knn(train_set,train_labels,test_set,i+1))),ax[i//3][i%3])
+    acc = (calculate_accuracy(test_labels,knn(train_set,train_labels,test_set,i+1)))
     ax[i//3][i%3].set_title("K={},accuracy={}".format(i+1,acc))
     ax[i//3][i%3].set_xticks([0,1,2])
     ax[i//3][i%3].set_yticks([0,1,2])
 
-plot_matrix(calculate_confusion_matrix(test_labels,np.array(knn_3d(train_set,train_labels,test_set,7))),ax[1][2])
-acc = (calculate_accuracy(test_labels,knn_3d(train_set,train_labels,test_set,7)))
+plot_matrix(calculate_confusion_matrix(test_labels,np.array(knn(train_set,train_labels,test_set,7))),ax[1][2])
+acc = (calculate_accuracy(test_labels,knn(train_set,train_labels,test_set,7)))
 ax[1][2].set_title("K=7,accuracy={}".format(acc))
 ax[1][2].set_xticks([0,1,2])
 ax[1][2].set_yticks([0,1,2])

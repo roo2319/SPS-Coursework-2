@@ -141,6 +141,18 @@ def feature_extract(train_set, test_set, features):
     reduced_train = train_set[:,features]
     reduced_test  = test_set [:,features]
     return reduced_train,reduced_test
+    
+#Deal with the edge case of a tie by taking k-1
+def knn_mode(callback,x,k):
+    neighbours = callback(x,k)
+    _, counts = np.unique(neighbours,return_counts=True) 
+    uniquecounts, countscounts = np.unique(counts,return_counts=True)
+    if countscounts[uniquecounts.argmax()] != 1 :
+        return knn_mode(callback,x,k-1)
+    else:
+        return (stats.mode(neighbours))[0][0]
+
+    
 
 def knn_alg(train_set, train_labels, test_set, k, n):
 
@@ -153,9 +165,8 @@ def knn_alg(train_set, train_labels, test_set, k, n):
     #Access the class given by the slice of size k of the sorted list
     k_nearest_neighbours = lambda x,k: [m[1] for m in k_nearest_points(x)[:k]]
 
-    #The classification will be the mode
-    classification = lambda x,k: stats.mode(k_nearest_neighbours(x,k))[0][0]
-    return [classification(p,k) for p in test_set]
+
+    return [knn_mode(k_nearest_neighbours,p,k) for p in test_set]
 
 def knn(train_set, train_labels, test_set, k, **kwargs):
     # write your code here and make sure you return the predictions at the end of 
