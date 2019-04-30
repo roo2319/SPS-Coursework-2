@@ -162,7 +162,7 @@ def knn_mode(callback,x,k):
 
     
 
-def knn_alg(train_set, train_labels, test_set, k, n):
+def knn_alg(train_set, train_labels, test_set, k):
 
     dist = lambda x, y: np.sqrt(np.sum((x-y)**2))
 
@@ -185,7 +185,7 @@ def knn(train_set, train_labels, test_set, k, **kwargs):
     scaler = StandardScaler()
     r_tr = scaler.fit_transform(r_tr)
     r_te = scaler.transform(r_te)
-    return knn_alg(r_tr,train_labels,r_te,k,2)
+    return knn_alg(r_tr,train_labels,r_te,k)
 
 
 
@@ -219,7 +219,7 @@ def knn_three_features(train_set, train_labels, test_set, k, **kwargs):
     scaler = StandardScaler()
     r_tr = scaler.fit_transform(r_tr)
     r_te = scaler.transform(r_te)
-    return knn_alg(r_tr,train_labels,r_te,k,3)
+    return knn_alg(r_tr,train_labels,r_te,k)
 
 
 def knn_pca(train_set, train_labels, test_set, k, n_components=2, **kwargs):
@@ -233,7 +233,7 @@ def knn_pca(train_set, train_labels, test_set, k, n_components=2, **kwargs):
     pca.fit(train_set)
     w_train = pca.transform(train_set)
     w_test  = pca.transform(test_set)
-    return knn_alg(w_train,train_labels,w_test,k,2)
+    return knn_alg(w_train,train_labels,w_test,k)
 
 
 
