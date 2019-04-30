@@ -143,7 +143,11 @@ def feature_extract(train_set, test_set, features):
     return reduced_train,reduced_test
 
 def knn_alg(train_set, train_labels, test_set, k, n):
-    dist = lambda x, y: (np.sum((x-y)**n))**(1/n)
+    if n == 2:
+        dist = lambda x, y: np.sqrt(np.sum((x-y)**2))
+    elif n == 3:
+        dist = lambda x,y: np.cbrt(np.sum((x-y)**2))
+
 
     #Return a list of tuples (dist,class) sorted on dist
     k_nearest_points = lambda x: sorted([(dist(x,point[0]),point[1]) for point in zip(train_set,train_labels)], key = lambda x: x[0])
@@ -194,7 +198,7 @@ def alternative_classifier(train_set, train_labels, test_set,trees, **kwargs):
 def knn_three_features(train_set, train_labels, test_set, k, **kwargs):
     # write your code here and make sure you return the predictions at the end of 
     # the function
-    r_tr, r_te = feature_extract(train_set,test_set,[0,6,11])
+    r_tr, r_te = feature_extract(train_set,test_set,[6,9,12])
     scaler = StandardScaler()
     r_tr = scaler.fit_transform(r_tr)
     r_te = scaler.transform(r_te)
