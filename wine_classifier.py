@@ -220,7 +220,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('mode', nargs=1, type=str, help='Running mode. Must be one of the following modes: {}'.format(MODES))
     parser.add_argument('--k', nargs='?', type=int, default=1, help='Number of neighbours for knn')
-    parser.add_argument('--trees', nargs='?',type=int, default=15,help='Number of trees for random forest')
+    parser.add_argument('--trees', nargs='?',type=int, default=16,help='Number of trees for random forest')
     parser.add_argument('--train_set_path', nargs='?', type=str, default='data/wine_train.csv', help='Path to the training set csv')
     parser.add_argument('--train_labels_path', nargs='?', type=str, default='data/wine_train_labels.csv', help='Path to training labels')
     parser.add_argument('--test_set_path', nargs='?', type=str, default='data/wine_test.csv', help='Path to the test set csv')
