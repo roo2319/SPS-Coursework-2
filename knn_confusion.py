@@ -49,13 +49,18 @@ for i in range(0,5):
     acc = (calculate_accuracy(test_labels,knn(train_set,train_labels,test_set,i+1)))
     ax[i//3][i%3].set_title("K={},accuracy={}".format(i+1,acc))
     ax[i//3][i%3].set_xticks([0,1,2])
+    ax[i//3][i%3].set_xticklabels([1,2,3])
     ax[i//3][i%3].set_yticks([0,1,2])
+    ax[i//3][i%3].set_yticklabels([1,2,3])
+
 
 plot_matrix(calculate_confusion_matrix(test_labels,np.array(knn(train_set,train_labels,test_set,7))),ax[1][2])
 acc = (calculate_accuracy(test_labels,knn(train_set,train_labels,test_set,7)))
 ax[1][2].set_title("K=7,accuracy={}".format(acc))
 ax[1][2].set_xticks([0,1,2])
+ax[1][2].set_xticklabels([1,2,3])
 ax[1][2].set_yticks([0,1,2])
+ax[1][2].set_yticklabels([1,2,3])
 plt.tight_layout()
 plt.show()
     

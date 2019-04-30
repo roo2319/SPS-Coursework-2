@@ -144,9 +144,17 @@ def feature_extract(train_set, test_set, features):
     
 #Deal with the edge case of a tie by taking k-1
 def knn_mode(callback,x,k):
+
     neighbours = callback(x,k)
+    
+    #Returns the count of each class, but we are interested 
+    #in if there is a tie in the max number
+    
     _, counts = np.unique(neighbours,return_counts=True) 
+
     uniquecounts, countscounts = np.unique(counts,return_counts=True)
+
+    #If the maximal count appears more than once, decrement k 
     if countscounts[uniquecounts.argmax()] != 1 :
         return knn_mode(callback,x,k-1)
     else:
